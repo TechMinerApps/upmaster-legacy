@@ -21,14 +21,24 @@ Two database is used in this project: InfluxDB and SQLite. Since UpMaster is des
 #### SQLite Table Design
 
 **Users**
-| ID       | Username | Alias  | Password      | Is_Admin | Endpoints   |
-| -------- | -------- | ------ | ------------- | -------- | ----------- |
-| Main Key | String   | String | Hashed String | Bool     | One-to-many |
+| ID       | Username | Alias  | Password      | Email  | Is_Admin | Endpoints   | Alerts      | Alert_Channels |
+| -------- | -------- | ------ | ------------- | ------ | -------- | ----------- | ----------- | -------------- |
+| Main Key | String   | String | Hashed String | String | Bool     | One-to-many | One-to-many | One-to-many    |
 
 **Endpoints**
-| ID       | UserID      | URL    | Interval     | Is_Enabled |
-| -------- | ----------- | ------ | ------------ | ---------- |
-| Main Key | Foreign Key | String | Int (Second) | Bool       |
+| ID       | Name   | UserID      | URL    | Interval     | Is_Enabled |
+| -------- | ------ | ----------- | ------ | ------------ | ---------- |
+| Main Key | String | Foreign Key | String | Int (Second) | Bool       |
+
+**Alert_Channels**
+| ID       | Name   | UserID      | Type             | Config | Alerts      |
+| -------- | ------ | ----------- | ---------------- | ------ | ----------- |
+| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many |
+
+**Alerts**
+| ID       | UserID      | Alert_Channel_ID | Status                  |
+| -------- | ----------- | ---------------- | ----------------------- |
+| Main Key | Foreign Key | Foreign Key      | Int (Alerting/Resolved) |
 
 **Configs**
 Used to store dynamic InfluxDB configuration
@@ -37,6 +47,7 @@ Used to store dynamic InfluxDB configuration
 | Main Key | String | Byte[] (After Marshal) |
 
 **OAuth**
+
 Used to provide storage for OAuth Server
 
 #### InfluxDB Design

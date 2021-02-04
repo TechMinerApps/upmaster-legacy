@@ -66,6 +66,30 @@ The process will do the following steps:
 - Update Admin Info: Create/Update a admin user according to config file.
 - Initialize InfluxDB: **influxdb-client-go** by InfluxDB Official is used as client. Database connection info is retrieved from SQLite. The database should already be create before this step. Measurement `up_status` will be created if not exists.
 
+### Alert Module Design
+If any alert channel is created, a `StatusChecker` is created as a goroutine. It periodically poll data from InfluxDB and calculate if an endpoint is down. Then `StatusChecker` send an alert to all configured alert channel.
+
+### Authencation Module Design
+
+OAuth Server
+
+Backend has a OAuth Server library, which uses oauth table in database. The OAuth library is configured to use `JWT` to generate `accessToken`. This `accessToken` must have a field identifying different client types. Token for frontend is set to expired in a short time like 30mins, token for upmaster-agent is set to expired in a longer time, such as 12h. 
+
+Casbin RBAC
+
+Token for frontend cannot write time series data, while token for agent cannot read any data.
+
+Frontend
+
+`<todo>`
+
+Agent
+
+OAuth 2.0 is intended to be used. Agent reads `client_id` and `client_secret` from config file or environment variable, and use them to get a `token` from backend. Then the `token` is used in api authentication. The `token` my expired, but it will be automatically renew by OAuth library. As a result, `.Token()` method must be called every time a new api call is conducted.
+
 ### API Design Principle
+API should be prefixed with version number, such as `v1`.
+API can be prefixed with certain prefix to avoid conflict with frontend. For example `api/v1`.
+
 
 ## Test Methods

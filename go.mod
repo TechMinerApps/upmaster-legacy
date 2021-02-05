@@ -3,6 +3,7 @@ module github.com/TechMinerApps/upmaster
 go 1.15
 
 require (
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	gorm.io/driver/mysql v1.0.4
 	gorm.io/driver/sqlite v1.1.4

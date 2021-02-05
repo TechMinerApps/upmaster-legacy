@@ -1,6 +1,9 @@
 package database
 
 import (
+	"strconv"
+
+	mysqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,6 +34,7 @@ type mysqlConfig struct {
 	Username string
 	Password string
 	Host     string
+	Port     int
 	DBName   string
 }
 
@@ -44,15 +48,16 @@ func NewDBConnection(c Config) (*gorm.DB, error) {
 	case SQLITE:
 		DB, err = gorm.Open(sqlite.Open(utils.AbsPath(c.SQLiteConfig.Path)), &gorm.Config{})
 	case MYSQL:
-		dsn := c.MySQLConfig.Username +
-			":" +
-			c.MySQLConfig.Password +
-			"@tcp(" +
-			c.MySQLConfig.Host +
-			")/" +
-			c.MySQLConfig.DBName +
-			"?charset=utf8mb4"
-		DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		cfg := mysqldriver.NewConfig()
+		cfg.User = c.MySQLConfig.Username
+		cfg.Passwd = c.MySQLConfig.Password
+		cfg.Net = "tcp"
+		cfg.Addr = c.MySQLConfig.Host + ":" + strconv.Itoa(c.MySQLConfig.Port)
+		cfg.DBName = c.MySQLConfig.DBName
+		// Charset is utf8mb4 by default
+		DB, err = gorm.Open(mysql.New(mysql.Config{
+			DSN: cfg.FormatDSN(),
+		}), &gorm.Config{})
 	}
 
 	// Handle errors

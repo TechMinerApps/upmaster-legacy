@@ -26,14 +26,14 @@ Two database is used in this project: InfluxDB and SQLite. Since UpMaster is des
 | Main Key | String   | String | Hashed String | String | Bool     | One-to-many | One-to-many | One-to-many    |
 
 **Endpoints**
-| ID       | Name   | UserID      | URL    | Interval     | Is_Enabled |
-| -------- | ------ | ----------- | ------ | ------------ | ---------- |
-| Main Key | String | Foreign Key | String | Int (Second) | Bool       |
+| ID       | Name   | UserID      | URL    | Interval     | Is_Enabled | Is_Visible | Alerts      |
+| -------- | ------ | ----------- | ------ | ------------ | ---------- | ---------- | ----------- |
+| Main Key | String | Foreign Key | String | Int (Second) | Bool       | Bool       | One-to-many |
 
 **Alert_Channels**
-| ID       | Name   | UserID      | Type             | Config | Alerts      |
-| -------- | ------ | ----------- | ---------------- | ------ | ----------- |
-| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many |
+| ID       | Name   | UserID      | Type             | Config | Alerts      | Is_Enabled |
+| -------- | ------ | ----------- | ---------------- | ------ | ----------- | ---------- |
+| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many | Bool       |
 
 **Alerts**
 | ID       | UserID      | Alert_Channel_ID | Status                  |
@@ -90,6 +90,47 @@ OAuth 2.0 is intended to be used. Agent reads `client_id` and `client_secret` fr
 ### API Design Principle
 API should be prefixed with version number, such as `v1`.
 API can be prefixed with certain prefix to avoid conflict with frontend. For example `api/v1`.
+
+The following design should be prefixed with `api/v1`:
+
+**Authentication API** /auth/
+
+POST `/auth/login` return JWT token for frontend
+
+POST `/auth/reset` Used by password reset
+
+OAuth Server at `/oauth`
+
+**Endpoint API** /endpoints required Admin (Except GET /)
+
+GET `/endpoints` Get all endpoints info (Used by agent)
+
+Other endpoint direct operation
+
+
+**User API** /users
+
+GET `/users` Admin
+
+User Permission is restricted within `/users/<username>` and `/users/<username>`
+
+PUT DELETE `/users/<id>` or `/users/<username>` Used by frontend admin page
+
+GET `/users/<username>/status` Used by frontend public page
+
+**Alert_Channel API** /alertchannels required Admin
+
+GET `/alertchannels` Get all alert channels.
+
+PUT DELETE `/alertchannels` Create/Delete a alert channel.
+
+PUT `/alertchannels/<id>` Update a alert channel.
+
+**Status API** /status
+
+PUT `/status/<endpoint_id>` is used by agent to write time series data
+
+GET `/status/<endpoint_id>` is used by frontend (Certain endpoint page)
 
 
 ## Test Methods

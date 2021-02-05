@@ -20,8 +20,8 @@ const (
 	MYSQL  DBType = 1
 )
 
-// Config is the config used to start a DB connection
-type Config struct {
+// RDBMSConfig is the config used to start a DB connection
+type RDBMSConfig struct {
 	Type         DBType
 	SQLiteConfig sqliteConfig
 	MySQLConfig  mysqlConfig
@@ -38,8 +38,8 @@ type mysqlConfig struct {
 	DBName   string
 }
 
-// NewDBConnection returns a DB object based on config provided
-func NewDBConnection(c Config) (*gorm.DB, error) {
+// NewRDBMSConnection returns a DB object based on config provided
+func NewRDBMSConnection(c RDBMSConfig) (*gorm.DB, error) {
 
 	var err error
 	var DB *gorm.DB

@@ -8,7 +8,10 @@
 
 ## Platform Requirements
 
+Require Go >= 1.15.8
+
 ## Commit Message Convention
+
 Use AngularJS style commit message.
 
 # Development
@@ -17,7 +20,9 @@ Use AngularJS style commit message.
 
 ## Detailed Design
 ### Database Table Design
+
 Two database is used in this project: InfluxDB and SQLite. Since UpMaster is designed for small teams, account information should be handled well by SQLite, while time serires data is stored in InfluxDB.
+
 #### SQLite Table Design
 
 **Users**
@@ -59,6 +64,7 @@ Measurement: **up_status**
 | -    | Bool (Field Key) | String (Tag Key) | Int (Tag Key) |
 
 ### Initialization Process
+
 The initialization process is designed to be **idempotent**. It collects configuration from config file or environment variable and reconfigure UpMaster.
 
 The process will do the following steps:
@@ -67,7 +73,10 @@ The process will do the following steps:
 - Initialize InfluxDB: **influxdb-client-go** by InfluxDB Official is used as client. Database connection info is retrieved from SQLite. The database should already be create before this step. Measurement `up_status` will be created if not exists.
 
 ### Alert Module Design
+
 If any alert channel is created, a `StatusChecker` is created as a goroutine. It periodically poll data from InfluxDB and calculate if an endpoint is down. Then `StatusChecker` send an alert to all configured alert channel.
+
+The status change is decided by a 'sliding window' algorithm, which consider endpoint down if all the points in the window is down. The same strategy is applied to nodes, that is to say, a endpoint is considered down only when all the agents report endpoint down.
 
 ### Authencation Module Design
 
@@ -89,6 +98,7 @@ OAuth 2.0 is intended to be used. Agent reads `client_id` and `client_secret` fr
 
 ### API Design Principle
 API should be prefixed with version number, such as `v1`.
+
 API can be prefixed with certain prefix to avoid conflict with frontend. For example `api/v1`.
 
 The following design should be prefixed with `api/v1`:

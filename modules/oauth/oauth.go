@@ -59,7 +59,7 @@ func (s *Server) createHandler() {
 	}
 	manager.MapClientStorage(clientStore)
 
-	manager.MapAccessGenerate( // Hardcoded signing method
+	manager.MapAccessGenerate( // Hardcoded signing method, should be safe enough
 		generates.NewJWTAccessGenerate("", s.Config.JWTKey, jwt.SigningMethodHS512))
 
 	srv := server.NewDefaultServer(manager)

@@ -19,5 +19,7 @@ func main() {
 
 	// Start main app
 	app.Start()
+
+	app.wg.Wait()
 	return
 }

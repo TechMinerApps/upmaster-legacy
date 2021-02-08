@@ -1,8 +1,9 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/TechMinerApps/upmaster/modules/oauth"
-	oauthApi "github.com/TechMinerApps/upmaster/router/api/v1/oauth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,10 +11,15 @@ type Config struct {
 	OAuthConfig oauth.Config
 }
 
-func NewRouter(c Config) *gin.Engine {
+func NewRouter(c Config) (*gin.Engine, error) {
 	router := gin.Default()
-	oauthServer, _ := oauth.NewServer(c.OAuthConfig)
-	router.Any("/oauth", oauthApi.Wrapper(oauthServer))
 
-	return router
+	oauthSubrouter := router.Group("/oauth/")
+	oauthAPI, err := oauth.NewServer(c.OAuthConfig)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to create OAuth server, %v", err)
+	}
+	oauthAPI.RegisterRoute(oauthSubrouter)
+
+	return router, nil
 }

@@ -45,7 +45,7 @@ func (db *InfluxDB) QueryAPI(org string) api.QueryAPI {
 // NewInfluxDBConnection is used to start a InfluxDB connection
 func NewInfluxDBConnection(c InfluxDBConfig) (*InfluxDB, error) {
 	var DB InfluxDB
-	if c.URL == "" || c.Token == "" || c.Bucket == "" || c.Org == "" {
+	if c.URL == "" || c.Bucket == "" || c.Org == "" {
 		return nil, errors.New("InfluxDB Connection Info Incomplete")
 	}
 	DB.Config = c

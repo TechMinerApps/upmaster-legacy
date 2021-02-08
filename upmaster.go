@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/TechMinerApps/upmaster/modules/database"
 	"github.com/TechMinerApps/upmaster/modules/utils"
@@ -19,8 +22,10 @@ import (
 type UpMaster struct {
 	Config Config
 
-	DB         *gorm.DB
-	HTTPServer *gin.Engine
+	DB          *gorm.DB
+	InfluxDB    *database.InfluxDB
+	HTTPServer  *http.Server
+	HTTPHandler *gin.Engine
 
 	viper  *viper.Viper
 	logger *logrus.Logger
@@ -30,9 +35,9 @@ type UpMaster struct {
 // Config has all the configuration required by UpMaster
 type Config struct {
 	Port            int
-	RDBMSConfig     database.RDBMSConfig
-	InfluxDBConfig  database.InfluxDBConfig
-	OAuthGCInterval int
+	RDBMSConfig     database.RDBMSConfig    `mapstructure:"rdbms"`
+	InfluxDBConfig  database.InfluxDBConfig `mapstructure:"influxdb"`
+	OAuthGCInterval int                     `mapstructure:"oauth_interval"`
 }
 
 // NewUpMaster is used to generate a UpMaster object
@@ -50,14 +55,39 @@ func NewUpMaster() *UpMaster {
 	return &app
 }
 
+// Start starts the instance of UpMaster non-blocking
+// waitgroup inside UpMaster is added by 1
 func (u *UpMaster) Start() {
+
+	u.HTTPServer = &http.Server{
+		Addr:    ":" + strconv.Itoa(u.Config.Port),
+		Handler: u.HTTPHandler,
+	}
+
 	u.wg.Add(1)
-	go u.HTTPServer.Run(":" + strconv.Itoa(u.Config.Port))
+
+	go func() {
+		if err := u.HTTPServer.ListenAndServe(); err != http.ErrServerClosed && err != nil {
+			u.logger.Errorf("HTTP Server Listen Error: %v", err)
+		}
+	}()
+	u.logger.Info("UpMaster Started")
+
 	return
 }
 
+// Stop does the graceful shutdown
+// waitgroup done here should reduce the waitgroup to 0
 func (u *UpMaster) Stop() {
 
+	// Graceful shutdown http server, with a  5 seconds timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := u.HTTPServer.Shutdown(ctx); err != nil {
+		u.logger.Errorf("Server Closed With Error: %s", err.Error())
+	}
+	u.logger.Info("UpMaster Shutdown")
+	u.wg.Done()
 }
 
 func (u *UpMaster) setupRouter() {
@@ -68,12 +98,24 @@ func (u *UpMaster) setupRouter() {
 	routerCfg.DBName = u.Config.RDBMSConfig.MySQLConfig.DBName
 	routerCfg.OAuthGCInterval = u.Config.OAuthGCInterval
 
-	// Create new server
-	u.HTTPServer = router.NewRouter(routerCfg)
+	// Create new handler
+	var err error
+	u.HTTPHandler, err = router.NewRouter(routerCfg)
+	if err != nil {
+		u.logger.Fatal(err)
+	}
 }
 
 func (u *UpMaster) setupDB() {
-	return
+	var err error
+	u.DB, err = database.NewRDBMSConnection(u.Config.RDBMSConfig)
+	if err != nil {
+		u.logger.Fatalf("Unable to establish RDBMS connection: %v", err)
+	}
+	u.InfluxDB, err = database.NewInfluxDBConnection(u.Config.InfluxDBConfig)
+	if err != nil {
+		u.logger.Fatalf("Unable to establish InfluxDB connection: %v", err)
+	}
 }
 
 func (u *UpMaster) setupViper() {
@@ -95,10 +137,13 @@ func (u *UpMaster) setupViper() {
 	u.viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	u.viper.AutomaticEnv()
 
-	err := u.viper.Unmarshal(u.Config)
-	if err != nil {
+	if err := u.viper.ReadInConfig(); err != nil {
 		// Used logger here, so setupLogger before setupViper
-		u.logger.Fatalf("unable to decode into struct, %v", err)
+		u.logger.Fatalf("Unable to read in config: %v", err)
+	}
+
+	if err := u.viper.Unmarshal(&u.Config); err != nil {
+		u.logger.Fatalf("Unable to decode into struct: %v", err)
 	}
 }
 

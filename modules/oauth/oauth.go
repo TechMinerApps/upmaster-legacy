@@ -9,6 +9,7 @@ import (
 	oauth2gorm "src.techknowlogick.com/oauth2-gorm"
 
 	jwt "github.com/dgrijalva/jwt-go/v4"
+	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -36,12 +37,12 @@ type Config struct {
 
 // Server is a object of OAuth Server
 type Server struct {
-	Handler http.Handler      // Handler can serve http requests
-	Config  Config            // Config is stored here incase needed
-	store   *oauth2gorm.Store // no one will likely use it, so private
+	Config Config // Config is stored here incase needed
+	Server *server.Server
+	store  *oauth2gorm.Store // no one will likely use it, so private
 }
 
-func (s *Server) createHandler() {
+func (s *Server) RegisterRoute(router *gin.RouterGroup) {
 
 	manager := manage.NewDefaultManager()
 
@@ -75,20 +76,18 @@ func (s *Server) createHandler() {
 		log.Println("Response Error:", re.Error.Error())
 	})
 
-	handler := http.NewServeMux()
-
-	handler.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
+	router.Any("/authorize", gin.WrapF(func(w http.ResponseWriter, r *http.Request) {
 		err := srv.HandleAuthorizeRequest(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
-	})
+	}))
 
-	handler.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+	router.Any("/token", gin.WrapF(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Token request.", r.URL.Path)
 		srv.HandleTokenRequest(w, r)
-	})
+	}))
 
-	s.Handler = handler
 }
 
 func (s *Server) createStore() {
@@ -103,7 +102,6 @@ func NewServer(c Config) (*Server, error) {
 	var s Server
 	s.Config = c
 	s.createStore()
-	s.createHandler()
 
 	return &s, nil
 }

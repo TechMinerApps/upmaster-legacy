@@ -13,11 +13,13 @@ func main() {
 
 	// Graceful Shutdown
 	go func() {
-		_ = <-sigchan
-		app.Stop()
+		sig := <-sigchan
+		app.Stop(sig)
 	}()
 
 	// Start main app
 	app.Start()
+
+	app.wg.Wait()
 	return
 }

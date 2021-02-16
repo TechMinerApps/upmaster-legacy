@@ -13,3 +13,13 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Config file for develeopment
+config.yml
+config.yaml
+
+# Delve debug file
+__debug_bin
+
+# Test Database
+*.db

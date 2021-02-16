@@ -1,6 +1,9 @@
 package database
 
 import (
+	"context"
+	"strconv"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/pkg/errors"
@@ -19,6 +22,13 @@ type InfluxDBConfig struct {
 type InfluxDB struct {
 	Config InfluxDBConfig
 	Client influxdb2.Client
+}
+
+// StatusPoint is a struct to write into InfluxDB
+type StatusPoint struct {
+	Up         bool
+	NodeID     int
+	EndpointID int
 }
 
 // WriteAPI returns the asynchronous, non-blocking, Write client from InfluxDB library
@@ -40,6 +50,31 @@ func (db *InfluxDB) Close() {
 // QueryAPI returns Query client
 func (db *InfluxDB) QueryAPI(org string) api.QueryAPI {
 	return db.Client.QueryAPI(db.Config.Org)
+}
+
+// Write write a StatusPoint to InflxuDB asyncronously
+func (db *InfluxDB) Write(s *StatusPoint) {
+	p := influxdb2.NewPointWithMeasurement("status").
+		AddField("up", s.Up).
+		AddTag("node", strconv.Itoa(s.NodeID)).
+		AddTag("endpoint", strconv.Itoa(s.EndpointID))
+
+	api := db.WriteAPI()
+	api.WritePoint(p)
+}
+
+// WriteBlocking write a StatusPoint to InfluxDB immediately
+func (db *InfluxDB) WriteBlocking(s *StatusPoint) error {
+	p := influxdb2.NewPointWithMeasurement("status").
+		AddField("up", s.Up).
+		AddTag("node", strconv.Itoa(s.NodeID)).
+		AddTag("endpoint", strconv.Itoa(s.EndpointID))
+
+	api := db.WriteAPIBlocking()
+	if err := api.WritePoint(context.Background(), p); err != nil {
+		return err
+	}
+	return nil
 }
 
 // NewInfluxDBConnection is used to start a InfluxDB connection

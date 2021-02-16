@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -68,7 +69,7 @@ func (u *UpMaster) Start() {
 
 	go func() {
 		if err := u.HTTPServer.ListenAndServe(); err != http.ErrServerClosed && err != nil {
-			u.logger.Errorf("HTTP Server Listen Error: %v", err)
+			u.logger.Fatalf("HTTP Server Listen Error: %v", err)
 		}
 	}()
 	u.logger.Info("UpMaster Started")
@@ -78,7 +79,10 @@ func (u *UpMaster) Start() {
 
 // Stop does the graceful shutdown
 // waitgroup done here should reduce the waitgroup to 0
-func (u *UpMaster) Stop() {
+func (u *UpMaster) Stop(sig os.Signal) {
+
+	// Log the reason for stopping
+	u.logger.Infof("Recieved signal %s", sig.String())
 
 	// Graceful shutdown http server, with a  5 seconds timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

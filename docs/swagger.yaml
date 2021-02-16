@@ -1,0 +1,32 @@
+definitions:
+  WriteEndpointResponse:
+    properties:
+      EndpointID:
+        format: int64
+        type: integer
+      NodeID:
+        format: int64
+        type: integer
+      Up:
+        format: int64
+        type: integer
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
+paths:
+  /status/{endpoint_id}:
+    post:
+      description: abc
+      operationId: WriteEndpointStatus
+      responses:
+        "200":
+          $ref: '#/responses/WriteEndpointStatus'
+      tags:
+      - Status
+responses:
+  WriteEndpointStatus:
+    description: ""
+    headers:
+      Body: {}
+    schema:
+      $ref: '#/definitions/WriteEndpointResponse'
+swagger: "2.0"

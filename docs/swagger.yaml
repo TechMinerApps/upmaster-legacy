@@ -1,15 +1,34 @@
 definitions:
+  WriteEndpointRequest:
+    properties:
+      endpoint_id:
+        format: int64
+        type: integer
+        x-go-name: EndpointID
+      node_id:
+        format: int64
+        type: integer
+        x-go-name: NodeID
+      up:
+        format: int64
+        type: integer
+        x-go-name: Up
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
   WriteEndpointResponse:
     properties:
-      EndpointID:
+      endpoint_id:
         format: int64
         type: integer
-      NodeID:
+        x-go-name: EndpointID
+      node_id:
         format: int64
         type: integer
-      Up:
+        x-go-name: NodeID
+      up:
         format: int64
         type: integer
+        x-go-name: Up
     type: object
     x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
 paths:
@@ -17,12 +36,24 @@ paths:
     post:
       description: abc
       operationId: WriteEndpointStatus
+      parameters:
+      - in: body
+        name: Body
+        schema:
+          $ref: '#/definitions/WriteEndpointRequest'
       responses:
         "200":
           $ref: '#/responses/WriteEndpointStatus'
+        "400":
+          $ref: '#/responses/BadRequestError'
       tags:
       - Status
 responses:
+  BadRequestError:
+    description: ""
+    headers:
+      error:
+        type: string
   WriteEndpointStatus:
     description: ""
     headers:

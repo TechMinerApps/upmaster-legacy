@@ -42,6 +42,7 @@ type Server struct {
 	store  *oauth2gorm.Store // no one will likely use it, so private
 }
 
+// RegisterRoute register th OAuth routes to router
 func (s *Server) RegisterRoute(router *gin.RouterGroup) {
 
 	manager := manage.NewDefaultManager()

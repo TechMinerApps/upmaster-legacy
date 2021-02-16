@@ -26,7 +26,7 @@ type InfluxDB struct {
 
 // StatusPoint is a struct to write into InfluxDB
 type StatusPoint struct {
-	Up         bool
+	Up         int
 	NodeID     int
 	EndpointID int
 }

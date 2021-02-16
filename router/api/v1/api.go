@@ -12,20 +12,17 @@ type Config struct {
 	OAuthConfig oauth.Config
 }
 
-func NewRouter(c Config) (*gin.Engine, error) {
-	router := gin.Default()
-
-	router.Static("/swagger/", "./docs")
+func SetupRouter(c Config, router *gin.Engine) error {
 
 	oauthSubrouter := router.Group("/oauth/")
 	oauthAPI, err := oauth.NewServer(c.OAuthConfig)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create OAuth server, %v", err)
+		return fmt.Errorf("Unable to create OAuth server, %v", err)
 	}
 	oauthAPI.RegisterRoute(oauthSubrouter)
 
 	statusAPI := router.Group("/status/")
 	statusAPI.POST("/:endpoint_id/", status.WriteEndpointStatus)
 
-	return router, nil
+	return nil
 }

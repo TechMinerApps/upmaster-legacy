@@ -90,7 +90,12 @@ Token for frontend cannot write time series data, while token for agent cannot r
 
 Frontend
 
-`<todo>`
+`accessToken` and `refreshToken` is used in frontend. Both of them will be save in Session Cookie instead of Permanent Cookie if `keep me login` option is not checked. Frontend will verify if token is still valid by doing following things. If one of this failed, frontend will mark user as logout and redirect user to login page. 
+
+1. Check `exp` field in `accessToken` and `refreshToken`.
+2. Send a request to `/users/<username>` to get user object and verify if token is valid at the same time.
+
+Before every request, frontend will check expire time of `accessToken` and request `/auth/refresh` API with refreshToken first based on the situation.
 
 Agent
 

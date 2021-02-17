@@ -128,7 +128,7 @@ PUT `/alertchannels/<id>` Update a alert channel.
 
 **Status API** /status
 
-PUT `/status/<endpoint_id>` is used by agent to write time series data
+PUT `/status` is used by agent to write time series data
 
 GET `/status/<endpoint_id>` is used by frontend (Certain endpoint page)
 

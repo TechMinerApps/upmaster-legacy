@@ -10,5 +10,5 @@ type swaggerResponseWriteStatus struct {
 // swagger:parameters WriteEndpointStatus
 type swaggerRequestWriteStatus struct {
 	// in:body
-	Body status.WriteEndpointRequest
+	Body []status.WriteEndpointRequest
 }

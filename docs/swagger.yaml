@@ -36,15 +36,17 @@ definitions:
 info:
   description: Documentation of upmaster api
 paths:
-  /status/{endpoint_id}:
+  /status:
     post:
-      description: abc
+      description: write endpoints status
       operationId: WriteEndpointStatus
       parameters:
       - in: body
         name: Body
         schema:
-          $ref: '#/definitions/WriteEndpointRequest'
+          items:
+            $ref: '#/definitions/WriteEndpointRequest'
+          type: array
       responses:
         "200":
           $ref: '#/responses/WriteEndpointStatus'

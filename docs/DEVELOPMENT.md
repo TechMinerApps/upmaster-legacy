@@ -26,24 +26,24 @@ Two database is used in this project: InfluxDB and SQLite. Since UpMaster is des
 #### SQLite Table Design
 
 **Users**
-| ID       | Username | Alias  | Password      | Email  | Is_Admin | Endpoints   | Alerts      | Alert_Channels |
+| ID       | Username | Alias  | Password      | Email  | IsAdmin  | Endpoints   | Alerts      | AlertChannels |
 | -------- | -------- | ------ | ------------- | ------ | -------- | ----------- | ----------- | -------------- |
 | Main Key | String   | String | Hashed String | String | Bool     | One-to-many | One-to-many | One-to-many    |
 
 **Endpoints**
-| ID       | Name   | UserID      | URL    | Interval     | Is_Enabled | Is_Visible | Alerts      |
-| -------- | ------ | ----------- | ------ | ------------ | ---------- | ---------- | ----------- |
-| Main Key | String | Foreign Key | String | Int (Second) | Bool       | Bool       | One-to-many |
+| ID       | Name   | UserID      | URL    | Interval     | IsEnabled  | IsVisible | Alerts      |
+| -------- | ------ | ----------- | ------ | ------------ | ---------- | --------- | ----------- |
+| Main Key | String | Foreign Key | String | Int (Second) | Bool       | Bool      | One-to-many |
 
-**Alert_Channels**
-| ID       | Name   | UserID      | Type             | Config | Alerts      | Is_Enabled |
-| -------- | ------ | ----------- | ---------------- | ------ | ----------- | ---------- |
-| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many | Bool       |
+**AlertChannels**
+| ID       | Name   | UserID      | Type             | Config | Alerts      | IsEnabled |
+| -------- | ------ | ----------- | ---------------- | ------ | ----------- | --------- |
+| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many | Bool      |
 
 **Alerts**
-| ID       | UserID      | Alert_Channel_ID | Status                  |
-| -------- | ----------- | ---------------- | ----------------------- |
-| Main Key | Foreign Key | Foreign Key      | Int (Alerting/Resolved) |
+| ID       | UserID      | AlertChannelID | Status                  |
+| -------- | ----------- | -------------- | ----------------------- |
+| Main Key | Foreign Key | Foreign Key    | Int (Alerting/Resolved) |
 
 **Configs**
 Used to store dynamic InfluxDB configuration
@@ -57,9 +57,9 @@ Used to provide storage for OAuth Server
 
 #### InfluxDB Design
 
-Measurement: **up_status**
+Measurement: **upstatus**
 
-| Time | Is_Up            | Node             | EndpointID    |
+| Time | IsUp             | Node             | EndpointID    |
 | ---- | ---------------- | ---------------- | ------------- |
 | -    | Bool (Field Key) | String (Tag Key) | Int (Tag Key) |
 
@@ -107,7 +107,8 @@ The following design should be prefixed with `api/v1`:
 
 POST `/auth/login` return JWT token for frontend
 
-POST `/auth/reset` Used by password reset
+POST `/auth/reset` Used to send verification token
+PUT `/auth/reset` Used by reset password (including update password)
 
 OAuth Server at `/oauth`
 
@@ -117,6 +118,11 @@ GET `/endpoints` Get all endpoints info (Used by agent)
 
 Other endpoint direct operation
 
+**Status API** /endpoints/<endpoint_id>/status
+
+PUT `/endpoints/<endpoint_id>/status` is used by agent to write time series data
+
+GET `/endpoints/<endpoint_id>/status` is used by frontend (Certain endpoint page)
 
 **User API** /users
 
@@ -124,11 +130,17 @@ GET `/users` Admin
 
 User Permission is restricted within `/users/<username>` and `/users/<username>`
 
-PUT DELETE `/users/<id>` or `/users/<username>` Used by frontend admin page
+PUT DELETE `/users/<username>` Used by frontend admin page
+
+GET `/users/<username>/endpoints` Used by frontend user
+
+POST `/users/<username>/endpoints` Used by frontend user
+
+PUT DELETE `/users/<username>/endpoints/<endpoint_id>` Used by frontend user
 
 GET `/users/<username>/status` Used by frontend public page
 
-**Alert_Channel API** /alertchannels required Admin
+**AlertChannel API** /alertchannels required Admin
 
 GET `/alertchannels` Get all alert channels.
 
@@ -136,11 +148,6 @@ PUT DELETE `/alertchannels` Create/Delete a alert channel.
 
 PUT `/alertchannels/<id>` Update a alert channel.
 
-**Status API** /status
-
-PUT `/status/<endpoint_id>` is used by agent to write time series data
-
-GET `/status/<endpoint_id>` is used by frontend (Certain endpoint page)
 
 
 ## Test Methods

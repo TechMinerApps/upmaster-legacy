@@ -20,7 +20,7 @@ type AuthLoginResponse struct {
 
 // Login handles login request, receiving username/email and password from request body and verify it
 func Login(c *gin.Context) {
-	// swagger:route POST /auth/login Login LoginCredencials
+	// swagger:route POST /auth/login Auth LoginCredencials
 	//    login with username/email and password
 	// responses:
 	//		200: AuthLoginResponse
@@ -29,7 +29,7 @@ func Login(c *gin.Context) {
 
 // Logout handles logout request, revoking user's AccessToken and RefreshToken
 func Logout(c *gin.Context) {
-	// swagger:route DELETE /auth/logout Logout
+	// swagger:route DELETE /auth/logout Auth Logout
 	//		logout user
 	//	responses:
 	//		204:

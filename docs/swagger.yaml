@@ -3,15 +3,6 @@ consumes:
 definitions:
   Alert:
     properties:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
       alert_channal:
         $ref: '#/definitions/AlertChannal'
       alert_channal_id:
@@ -36,15 +27,6 @@ definitions:
     x-go-package: github.com/TechMinerApps/upmaster/models
   AlertChannal:
     properties:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
       alerts:
         items:
           $ref: '#/definitions/Alert'
@@ -80,15 +62,6 @@ definitions:
     x-go-package: github.com/TechMinerApps/upmaster/models
   Endpoint:
     properties:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
       alerts:
         items:
           $ref: '#/definitions/Alert'
@@ -125,15 +98,6 @@ definitions:
     x-go-package: github.com/TechMinerApps/upmaster/models
   User:
     properties:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
       alert_channals:
         items:
           $ref: '#/definitions/AlertChannal'
@@ -163,7 +127,6 @@ definitions:
         type: string
         x-go-name: Password
       username:
-        description: in:body
         type: string
         x-go-name: Username
     type: object
@@ -227,7 +190,7 @@ paths:
         "401":
           description: ""
       tags:
-      - Login
+      - Auth
   /auth/logout:
     delete:
       description: logout user
@@ -235,6 +198,8 @@ paths:
       responses:
         "204":
           description: ""
+      tags:
+      - Auth
   /auth/reset:
     post:
       description: send reset token to email
@@ -250,7 +215,7 @@ paths:
         "500":
           description: ""
       tags:
-      - SendResetToken
+      - Auth
     put:
       description: reset password of curresponding user of the token
       operationId: ResetPasswordRequest
@@ -265,7 +230,7 @@ paths:
         "404":
           description: ""
       tags:
-      - ResetPassword
+      - Auth
   /endpoints:
     get:
       description: list all endpoints, FOR AGENT/ADMIN ONLY
@@ -273,35 +238,37 @@ paths:
       responses:
         "200":
           $ref: '#/responses/IndexEndpointResponse'
+      tags:
+      - Endpoint
     post:
       description: create a new endpoint
-      operationId: Endpoint
+      operationId: StoreEndpoit
       responses:
         "200":
           $ref: '#/responses/Endpoint'
       tags:
-      - StoreEndpoit
+      - Endpoint
   /endpoints/{id}:
     delete:
       description: delete an existing endpoint
-      operationId: Endpoint
+      operationId: UpdateEndpoint
       responses:
         "204":
           description: ""
         "404":
           description: ""
       tags:
-      - UpdateEndpoint
+      - Endpoint
     put:
       description: update an existing endpoint
-      operationId: Endpoint
+      operationId: UpdateEndpoint
       responses:
         "200":
           $ref: '#/responses/Endpoint'
         "404":
           description: ""
       tags:
-      - UpdateEndpoint
+      - Endpoint
   /status:
     post:
       description: write endpoints status
@@ -327,29 +294,25 @@ paths:
       responses:
         "200":
           $ref: '#/responses/IndexUserResponse'
+      tags:
+      - User
   /users/{username}:
     delete:
-      description: |-
-        destroy user by admin or user himself
-        response:
-        204:
-      operationId: DestroyUserRequest
-      parameters:
-      - in: body
-        name: password
-        schema:
-          type: string
-        x-go-name: Password
+      description: destroy user by admin or user himself
+      operationId: DestroyUser
+      responses:
+        "204":
+          $ref: '#/responses/DestroyUserRequest'
       tags:
-      - DestroyUser
+      - User
     put:
-      description: |-
-        update user info
-        response:
-        200: User
-      operationId: User
+      description: update user info
+      operationId: UpdateUser
+      responses:
+        "200":
+          $ref: '#/responses/UserResponse'
       tags:
-      - UpdateUser
+      - User
 produces:
 - application/json
 responses:
@@ -368,15 +331,6 @@ responses:
   Endpoint:
     description: ""
     headers:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
       alerts:
         items:
           $ref: '#/definitions/Alert'
@@ -412,39 +366,12 @@ responses:
       items:
         $ref: '#/definitions/User'
       type: array
-  User:
+  UserResponse:
     description: ""
     headers:
-      CreatedAt:
-        format: date-time
-        type: string
-      DeletedAt:
-        format: date-time
-        type: string
-      UpdatedAt:
-        format: date-time
-        type: string
-      alert_channals:
-        items:
-          $ref: '#/definitions/AlertChannal'
-        type: array
-      alerts:
-        items:
-          $ref: '#/definitions/Alert'
-        type: array
-      email:
-        type: string
-      endpoints:
-        items:
-          $ref: '#/definitions/Endpoint'
-        type: array
-      id:
-        format: uint64
-        type: integer
-      is_admin:
-        type: boolean
-      password:
-        type: string
+      Body: {}
+    schema:
+      $ref: '#/definitions/User'
   WriteEndpointStatus:
     description: ""
     headers:

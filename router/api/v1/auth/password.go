@@ -14,7 +14,7 @@ type AuthResetPasswordRequest struct {
 
 // SendResetToken sends reset password token to user's email
 func SendResetToken(c *gin.Context) {
-	// swagger:route POST /auth/reset SendResetToken ResetTokenRequest
+	// swagger:route POST /auth/reset Auth ResetTokenRequest
 	//		send reset token to email
 	// responses:
 	//		204:
@@ -23,7 +23,7 @@ func SendResetToken(c *gin.Context) {
 
 // ResetPassword reset password of user
 func ResetPassword(c *gin.Context) {
-	// swagger:route PUT /auth/reset ResetPassword ResetPasswordRequest
+	// swagger:route PUT /auth/reset Auth ResetPasswordRequest
 	//		reset password of curresponding user of the token
 	// responses:
 	//		204:

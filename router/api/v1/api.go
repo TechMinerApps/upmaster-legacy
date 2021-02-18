@@ -7,6 +7,7 @@ import (
 	"github.com/TechMinerApps/upmaster/router/api/v1/auth"
 	"github.com/TechMinerApps/upmaster/router/api/v1/endpoints"
 	"github.com/TechMinerApps/upmaster/router/api/v1/status"
+	"github.com/TechMinerApps/upmaster/router/api/v1/users"
 	"github.com/gin-gonic/gin"
 )
 

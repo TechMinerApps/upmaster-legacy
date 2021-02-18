@@ -1,3 +1,14 @@
+// Documentation of upmaster api
+//
+//		Schemes: http, https
+//
+//		Consumes:
+//			- application/json
+//
+//		Produces:
+//			- application/json
+//
+// swagger:meta
 package router
 
 import (

@@ -19,8 +19,8 @@ type WriteEndpointRequest struct {
 }
 
 func WriteEndpointStatus(c *gin.Context) {
-	// swagger:route POST /status/{endpoint_id} Status WriteEndpointStatus
-	//    abc
+	// swagger:route POST /status Status WriteEndpointStatus
+	//    write endpoints status
 	// responses:
 	//   200: WriteEndpointStatus
 	//   400: BadRequestError
@@ -38,5 +38,4 @@ func WriteEndpointStatus(c *gin.Context) {
 	}
 	influx.Write(&p)
 	logger.Info("StatusPoint write success")
-	return
 }

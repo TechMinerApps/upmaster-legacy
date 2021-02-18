@@ -1,4 +1,136 @@
+consumes:
+- application/json
 definitions:
+  Alert:
+    properties:
+      alert_channal:
+        $ref: '#/definitions/AlertChannal'
+      alert_channal_id:
+        format: uint64
+        type: integer
+        x-go-name: AlertChannalID
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      status:
+        format: uint64
+        type: integer
+        x-go-name: Status
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  AlertChannal:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      config:
+        items:
+          format: uint8
+          type: integer
+        type: array
+        x-go-name: Config
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      is_enabled:
+        type: boolean
+        x-go-name: IsEnabled
+      name:
+        type: string
+        x-go-name: Name
+      type:
+        format: uint64
+        type: integer
+        x-go-name: Type
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  Endpoint:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      interval:
+        format: uint64
+        type: integer
+        x-go-name: Interval
+      is_enabled:
+        type: boolean
+        x-go-name: IsEnabled
+      is_public:
+        type: boolean
+        x-go-name: IsPublic
+      name:
+        description: in:body
+        type: string
+        x-go-name: Name
+      url:
+        type: string
+        x-go-name: URL
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  User:
+    properties:
+      alert_channals:
+        items:
+          $ref: '#/definitions/AlertChannal'
+        type: array
+        x-go-name: AlertChannals
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      email:
+        type: string
+        x-go-name: Email
+      endpoints:
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
+        x-go-name: Endpoints
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      is_admin:
+        type: boolean
+        x-go-name: IsAdmin
+      password:
+        type: string
+        x-go-name: Password
+      username:
+        type: string
+        x-go-name: Username
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
   WriteEndpointRequest:
     properties:
       endpoint_id:
@@ -31,16 +163,123 @@ definitions:
         x-go-name: Up
     type: object
     x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
+info:
+  description: Documentation of upmaster api
 paths:
-  /status/{endpoint_id}:
+  /auth/login:
     post:
-      description: abc
+      description: login with username/email and password
+      operationId: LoginCredencials
+      parameters:
+      - in: body
+        name: email
+        schema:
+          type: string
+        x-go-name: Email
+      - in: query
+        name: username
+        type: string
+        x-go-name: Username
+      - in: query
+        name: password
+        type: string
+        x-go-name: Password
+      responses:
+        "200":
+          $ref: '#/responses/AuthLoginResponse'
+        "401":
+          description: ""
+      tags:
+      - Auth
+  /auth/logout:
+    delete:
+      description: logout user
+      operationId: Logout
+      responses:
+        "204":
+          description: ""
+      tags:
+      - Auth
+  /auth/reset:
+    post:
+      description: send reset token to email
+      operationId: ResetTokenRequest
+      parameters:
+      - in: query
+        name: email
+        type: string
+        x-go-name: Email
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      tags:
+      - Auth
+    put:
+      description: reset password of curresponding user of the token
+      operationId: ResetPasswordRequest
+      parameters:
+      - in: query
+        name: token
+        type: string
+        x-go-name: Token
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - Auth
+  /endpoints:
+    get:
+      description: list all endpoints, FOR AGENT/ADMIN ONLY
+      operationId: IndexEndpoint
+      responses:
+        "200":
+          $ref: '#/responses/IndexEndpointResponse'
+      tags:
+      - Endpoint
+    post:
+      description: create a new endpoint
+      operationId: StoreEndpoit
+      responses:
+        "200":
+          $ref: '#/responses/Endpoint'
+      tags:
+      - Endpoint
+  /endpoints/{id}:
+    delete:
+      description: delete an existing endpoint
+      operationId: UpdateEndpoint
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - Endpoint
+    put:
+      description: update an existing endpoint
+      operationId: UpdateEndpoint
+      responses:
+        "200":
+          $ref: '#/responses/Endpoint'
+        "404":
+          description: ""
+      tags:
+      - Endpoint
+  /status:
+    post:
+      description: write endpoints status
       operationId: WriteEndpointStatus
       parameters:
       - in: body
         name: Body
         schema:
-          $ref: '#/definitions/WriteEndpointRequest'
+          items:
+            $ref: '#/definitions/WriteEndpointRequest'
+          type: array
       responses:
         "200":
           $ref: '#/responses/WriteEndpointStatus'
@@ -48,16 +287,98 @@ paths:
           $ref: '#/responses/BadRequestError'
       tags:
       - Status
+  /users:
+    get:
+      description: list all users, FOR ADMIN ONLY
+      operationId: IndexUser
+      responses:
+        "200":
+          $ref: '#/responses/IndexUserResponse'
+      tags:
+      - User
+  /users/{username}:
+    delete:
+      description: destroy user by admin or user himself
+      operationId: DestroyUser
+      responses:
+        "204":
+          $ref: '#/responses/DestroyUserRequest'
+      tags:
+      - User
+    put:
+      description: update user info
+      operationId: UpdateUser
+      responses:
+        "200":
+          $ref: '#/responses/UserResponse'
+      tags:
+      - User
+produces:
+- application/json
 responses:
+  AuthLoginResponse:
+    description: ""
+    headers:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
   BadRequestError:
     description: ""
     headers:
       error:
         type: string
+  Endpoint:
+    description: ""
+    headers:
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+      id:
+        format: uint64
+        type: integer
+      interval:
+        format: uint64
+        type: integer
+      is_enabled:
+        type: boolean
+      is_public:
+        type: boolean
+      url:
+        type: string
+      user: {}
+      user_id:
+        format: uint64
+        type: integer
+    schema:
+      $ref: '#/definitions/User'
+  IndexEndpointResponse:
+    description: ""
+    headers:
+      endpoints:
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
+  IndexUserResponse:
+    description: ""
+    schema:
+      items:
+        $ref: '#/definitions/User'
+      type: array
+  UserResponse:
+    description: ""
+    headers:
+      Body: {}
+    schema:
+      $ref: '#/definitions/User'
   WriteEndpointStatus:
     description: ""
     headers:
       Body: {}
     schema:
       $ref: '#/definitions/WriteEndpointResponse'
+schemes:
+- http
+- https
 swagger: "2.0"

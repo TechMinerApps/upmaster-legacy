@@ -36,6 +36,69 @@ definitions:
 info:
   description: Documentation of upmaster api
 paths:
+  /auth/login:
+    post:
+      description: login with username/email and password
+      operationId: LoginCredencials
+      parameters:
+      - in: body
+        name: email
+        schema:
+          type: string
+        x-go-name: Email
+      - in: query
+        name: username
+        type: string
+        x-go-name: Username
+      - in: query
+        name: password
+        type: string
+        x-go-name: Password
+      responses:
+        "200":
+          $ref: '#/responses/AuthLoginResponse'
+        "401":
+          description: ""
+      tags:
+      - Login
+  /auth/logout:
+    delete:
+      description: logout user
+      operationId: Logout
+      responses:
+        "204":
+          description: ""
+  /auth/reset:
+    post:
+      description: send reset token to email
+      operationId: ResetTokenRequest
+      parameters:
+      - in: query
+        name: email
+        type: string
+        x-go-name: Email
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      tags:
+      - SendResetToken
+    put:
+      description: reset password of curresponding user of the token
+      operationId: ResetPasswordRequest
+      parameters:
+      - in: query
+        name: token
+        type: string
+        x-go-name: Token
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - ResetPassword
   /status:
     post:
       description: write endpoints status
@@ -57,6 +120,13 @@ paths:
 produces:
 - application/json
 responses:
+  AuthLoginResponse:
+    description: ""
+    headers:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
   BadRequestError:
     description: ""
     headers:

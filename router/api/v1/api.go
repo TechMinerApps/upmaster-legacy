@@ -27,10 +27,10 @@ func SetupRouter(c Config, router *gin.Engine) error {
 
 	authAPI := router.Group("auth")
 	{
-		authAPI.POST("/auth/login", auth.Login)
-		authAPI.DELETE("/auth/logout", auth.Logout)
-		authAPI.POST("/auth/reset", auth.SendResetToken)
-		authAPI.PUT("/auth/reset", auth.ResetPassword)
+		authAPI.POST("/login", auth.Login)
+		authAPI.DELETE("/logout", auth.Logout)
+		authAPI.POST("/reset", auth.SendResetToken)
+		authAPI.PUT("/reset", auth.ResetPassword)
 	}
 
 	endpointsAPI := router.Group("endpoints")

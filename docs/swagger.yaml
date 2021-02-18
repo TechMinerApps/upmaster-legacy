@@ -109,6 +109,7 @@ definitions:
         type: boolean
         x-go-name: IsPublic
       name:
+        description: in:body
         type: string
         x-go-name: Name
       url:
@@ -162,6 +163,7 @@ definitions:
         type: string
         x-go-name: Password
       username:
+        description: in:body
         type: string
         x-go-name: Username
     type: object
@@ -272,127 +274,17 @@ paths:
         "200":
           $ref: '#/responses/IndexEndpointResponse'
     post:
-      description: delete an existing endpoint
+      description: create a new endpoint
       operationId: Endpoint
-      parameters:
-      - format: uint64
-        in: query
-        name: id
-        type: integer
-        x-go-name: ID
-      - format: date-time
-        in: query
-        name: CreatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: UpdatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: DeletedAt
-        type: string
-      - in: query
-        name: name
-        type: string
-        x-go-name: Name
-      - $ref: '#/definitions/User'
-        in: query
-        name: user
-        x-go-name: User
-      - format: uint64
-        in: query
-        name: user_id
-        type: integer
-        x-go-name: UserID
-      - in: query
-        name: url
-        type: string
-        x-go-name: URL
-      - format: uint64
-        in: query
-        name: interval
-        type: integer
-        x-go-name: Interval
-      - in: query
-        name: is_enabled
-        type: boolean
-        x-go-name: IsEnabled
-      - in: query
-        name: is_public
-        type: boolean
-        x-go-name: IsPublic
-      - in: query
-        items:
-          $ref: '#/definitions/Alert'
-        name: alerts
-        type: array
-        x-go-name: Alerts
       responses:
-        "204":
-          description: ""
-        "404":
-          description: ""
+        "200":
+          $ref: '#/responses/Endpoint'
       tags:
-      - UpdateEndpoint
+      - StoreEndpoit
   /endpoints/{id}:
     delete:
       description: delete an existing endpoint
       operationId: Endpoint
-      parameters:
-      - format: uint64
-        in: query
-        name: id
-        type: integer
-        x-go-name: ID
-      - format: date-time
-        in: query
-        name: CreatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: UpdatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: DeletedAt
-        type: string
-      - in: query
-        name: name
-        type: string
-        x-go-name: Name
-      - $ref: '#/definitions/User'
-        in: query
-        name: user
-        x-go-name: User
-      - format: uint64
-        in: query
-        name: user_id
-        type: integer
-        x-go-name: UserID
-      - in: query
-        name: url
-        type: string
-        x-go-name: URL
-      - format: uint64
-        in: query
-        name: interval
-        type: integer
-        x-go-name: Interval
-      - in: query
-        name: is_enabled
-        type: boolean
-        x-go-name: IsEnabled
-      - in: query
-        name: is_public
-        type: boolean
-        x-go-name: IsPublic
-      - in: query
-        items:
-          $ref: '#/definitions/Alert'
-        name: alerts
-        type: array
-        x-go-name: Alerts
       responses:
         "204":
           description: ""
@@ -401,65 +293,11 @@ paths:
       tags:
       - UpdateEndpoint
     put:
-      description: delete an existing endpoint
+      description: update an existing endpoint
       operationId: Endpoint
-      parameters:
-      - format: uint64
-        in: query
-        name: id
-        type: integer
-        x-go-name: ID
-      - format: date-time
-        in: query
-        name: CreatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: UpdatedAt
-        type: string
-      - format: date-time
-        in: query
-        name: DeletedAt
-        type: string
-      - in: query
-        name: name
-        type: string
-        x-go-name: Name
-      - $ref: '#/definitions/User'
-        in: query
-        name: user
-        x-go-name: User
-      - format: uint64
-        in: query
-        name: user_id
-        type: integer
-        x-go-name: UserID
-      - in: query
-        name: url
-        type: string
-        x-go-name: URL
-      - format: uint64
-        in: query
-        name: interval
-        type: integer
-        x-go-name: Interval
-      - in: query
-        name: is_enabled
-        type: boolean
-        x-go-name: IsEnabled
-      - in: query
-        name: is_public
-        type: boolean
-        x-go-name: IsPublic
-      - in: query
-        items:
-          $ref: '#/definitions/Alert'
-        name: alerts
-        type: array
-        x-go-name: Alerts
       responses:
-        "204":
-          description: ""
+        "200":
+          $ref: '#/responses/Endpoint'
         "404":
           description: ""
       tags:
@@ -482,6 +320,36 @@ paths:
           $ref: '#/responses/BadRequestError'
       tags:
       - Status
+  /users:
+    get:
+      description: list all users, FOR ADMIN ONLY
+      operationId: IndexUser
+      responses:
+        "200":
+          $ref: '#/responses/IndexUserResponse'
+  /users/{username}:
+    delete:
+      description: |-
+        destroy user by admin or user himself
+        response:
+        204:
+      operationId: DestroyUserRequest
+      parameters:
+      - in: body
+        name: password
+        schema:
+          type: string
+        x-go-name: Password
+      tags:
+      - DestroyUser
+    put:
+      description: |-
+        update user info
+        response:
+        200: User
+      operationId: User
+      tags:
+      - UpdateUser
 produces:
 - application/json
 responses:
@@ -497,6 +365,40 @@ responses:
     headers:
       error:
         type: string
+  Endpoint:
+    description: ""
+    headers:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+      id:
+        format: uint64
+        type: integer
+      interval:
+        format: uint64
+        type: integer
+      is_enabled:
+        type: boolean
+      is_public:
+        type: boolean
+      url:
+        type: string
+      user: {}
+      user_id:
+        format: uint64
+        type: integer
+    schema:
+      $ref: '#/definitions/User'
   IndexEndpointResponse:
     description: ""
     headers:
@@ -504,6 +406,45 @@ responses:
         items:
           $ref: '#/definitions/Endpoint'
         type: array
+  IndexUserResponse:
+    description: ""
+    schema:
+      items:
+        $ref: '#/definitions/User'
+      type: array
+  User:
+    description: ""
+    headers:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alert_channals:
+        items:
+          $ref: '#/definitions/AlertChannal'
+        type: array
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+      email:
+        type: string
+      endpoints:
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
+      id:
+        format: uint64
+        type: integer
+      is_admin:
+        type: boolean
+      password:
+        type: string
   WriteEndpointStatus:
     description: ""
     headers:

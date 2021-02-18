@@ -1,8 +1,9 @@
 package models
 
-// swagger:parameters Endpoint
+// swagger:response Endpoint
 type Endpoint struct {
 	BaseModel
+	// in:body
 	Name      string  `json:"name"`
 	User      *User   `json:"user,omitempty"`
 	UserID    uint    `json:"user_id"`

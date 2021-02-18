@@ -1,6 +1,171 @@
 consumes:
 - application/json
 definitions:
+  Alert:
+    properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alert_channal:
+        $ref: '#/definitions/AlertChannal'
+      alert_channal_id:
+        format: uint64
+        type: integer
+        x-go-name: AlertChannalID
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      status:
+        format: uint64
+        type: integer
+        x-go-name: Status
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  AlertChannal:
+    properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      config:
+        items:
+          format: uint8
+          type: integer
+        type: array
+        x-go-name: Config
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      is_enabled:
+        type: boolean
+        x-go-name: IsEnabled
+      name:
+        type: string
+        x-go-name: Name
+      type:
+        format: uint64
+        type: integer
+        x-go-name: Type
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  Endpoint:
+    properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      interval:
+        format: uint64
+        type: integer
+        x-go-name: Interval
+      is_enabled:
+        type: boolean
+        x-go-name: IsEnabled
+      is_public:
+        type: boolean
+        x-go-name: IsPublic
+      name:
+        type: string
+        x-go-name: Name
+      url:
+        type: string
+        x-go-name: URL
+      user:
+        $ref: '#/definitions/User'
+      user_id:
+        format: uint64
+        type: integer
+        x-go-name: UserID
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
+  User:
+    properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      UpdatedAt:
+        format: date-time
+        type: string
+      alert_channals:
+        items:
+          $ref: '#/definitions/AlertChannal'
+        type: array
+        x-go-name: AlertChannals
+      alerts:
+        items:
+          $ref: '#/definitions/Alert'
+        type: array
+        x-go-name: Alerts
+      email:
+        type: string
+        x-go-name: Email
+      endpoints:
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
+        x-go-name: Endpoints
+      id:
+        format: uint64
+        type: integer
+        x-go-name: ID
+      is_admin:
+        type: boolean
+        x-go-name: IsAdmin
+      password:
+        type: string
+        x-go-name: Password
+      username:
+        type: string
+        x-go-name: Username
+    type: object
+    x-go-package: github.com/TechMinerApps/upmaster/models
   WriteEndpointRequest:
     properties:
       endpoint_id:
@@ -99,6 +264,206 @@ paths:
           description: ""
       tags:
       - ResetPassword
+  /endpoints:
+    get:
+      description: list all endpoints, FOR AGENT/ADMIN ONLY
+      operationId: IndexEndpoint
+      responses:
+        "200":
+          $ref: '#/responses/IndexEndpointResponse'
+    post:
+      description: delete an existing endpoint
+      operationId: Endpoint
+      parameters:
+      - format: uint64
+        in: query
+        name: id
+        type: integer
+        x-go-name: ID
+      - format: date-time
+        in: query
+        name: CreatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: UpdatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: DeletedAt
+        type: string
+      - in: query
+        name: name
+        type: string
+        x-go-name: Name
+      - $ref: '#/definitions/User'
+        in: query
+        name: user
+        x-go-name: User
+      - format: uint64
+        in: query
+        name: user_id
+        type: integer
+        x-go-name: UserID
+      - in: query
+        name: url
+        type: string
+        x-go-name: URL
+      - format: uint64
+        in: query
+        name: interval
+        type: integer
+        x-go-name: Interval
+      - in: query
+        name: is_enabled
+        type: boolean
+        x-go-name: IsEnabled
+      - in: query
+        name: is_public
+        type: boolean
+        x-go-name: IsPublic
+      - in: query
+        items:
+          $ref: '#/definitions/Alert'
+        name: alerts
+        type: array
+        x-go-name: Alerts
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - UpdateEndpoint
+  /endpoints/{id}:
+    delete:
+      description: delete an existing endpoint
+      operationId: Endpoint
+      parameters:
+      - format: uint64
+        in: query
+        name: id
+        type: integer
+        x-go-name: ID
+      - format: date-time
+        in: query
+        name: CreatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: UpdatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: DeletedAt
+        type: string
+      - in: query
+        name: name
+        type: string
+        x-go-name: Name
+      - $ref: '#/definitions/User'
+        in: query
+        name: user
+        x-go-name: User
+      - format: uint64
+        in: query
+        name: user_id
+        type: integer
+        x-go-name: UserID
+      - in: query
+        name: url
+        type: string
+        x-go-name: URL
+      - format: uint64
+        in: query
+        name: interval
+        type: integer
+        x-go-name: Interval
+      - in: query
+        name: is_enabled
+        type: boolean
+        x-go-name: IsEnabled
+      - in: query
+        name: is_public
+        type: boolean
+        x-go-name: IsPublic
+      - in: query
+        items:
+          $ref: '#/definitions/Alert'
+        name: alerts
+        type: array
+        x-go-name: Alerts
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - UpdateEndpoint
+    put:
+      description: delete an existing endpoint
+      operationId: Endpoint
+      parameters:
+      - format: uint64
+        in: query
+        name: id
+        type: integer
+        x-go-name: ID
+      - format: date-time
+        in: query
+        name: CreatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: UpdatedAt
+        type: string
+      - format: date-time
+        in: query
+        name: DeletedAt
+        type: string
+      - in: query
+        name: name
+        type: string
+        x-go-name: Name
+      - $ref: '#/definitions/User'
+        in: query
+        name: user
+        x-go-name: User
+      - format: uint64
+        in: query
+        name: user_id
+        type: integer
+        x-go-name: UserID
+      - in: query
+        name: url
+        type: string
+        x-go-name: URL
+      - format: uint64
+        in: query
+        name: interval
+        type: integer
+        x-go-name: Interval
+      - in: query
+        name: is_enabled
+        type: boolean
+        x-go-name: IsEnabled
+      - in: query
+        name: is_public
+        type: boolean
+        x-go-name: IsPublic
+      - in: query
+        items:
+          $ref: '#/definitions/Alert'
+        name: alerts
+        type: array
+        x-go-name: Alerts
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: ""
+      tags:
+      - UpdateEndpoint
   /status:
     post:
       description: write endpoints status
@@ -132,6 +497,13 @@ responses:
     headers:
       error:
         type: string
+  IndexEndpointResponse:
+    description: ""
+    headers:
+      endpoints:
+        items:
+          $ref: '#/definitions/Endpoint'
+        type: array
   WriteEndpointStatus:
     description: ""
     headers:

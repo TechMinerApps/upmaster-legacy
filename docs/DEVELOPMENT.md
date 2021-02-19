@@ -8,7 +8,10 @@
 
 ## Platform Requirements
 
+Require Go >= 1.15.8
+
 ## Commit Message Convention
+
 Use AngularJS style commit message.
 
 # Development
@@ -17,28 +20,30 @@ Use AngularJS style commit message.
 
 ## Detailed Design
 ### Database Table Design
+
 Two database is used in this project: InfluxDB and SQLite. Since UpMaster is designed for small teams, account information should be handled well by SQLite, while time serires data is stored in InfluxDB.
+
 #### SQLite Table Design
 
 **Users**
-| ID       | Username | Alias  | Password      | Email  | Is_Admin | Endpoints   | Alerts      | Alert_Channels |
-| -------- | -------- | ------ | ------------- | ------ | -------- | ----------- | ----------- | -------------- |
-| Main Key | String   | String | Hashed String | String | Bool     | One-to-many | One-to-many | One-to-many    |
+| ID       | Username | Alias  | Password      | Email  | IsAdmin | Endpoints   | Alerts      | AlertChannels |
+| -------- | -------- | ------ | ------------- | ------ | ------- | ----------- | ----------- | ------------- |
+| Main Key | String   | String | Hashed String | String | Bool    | One-to-many | One-to-many | One-to-many   |
 
 **Endpoints**
-| ID       | Name   | UserID      | URL    | Interval     | Is_Enabled | Is_Visible | Alerts      |
-| -------- | ------ | ----------- | ------ | ------------ | ---------- | ---------- | ----------- |
-| Main Key | String | Foreign Key | String | Int (Second) | Bool       | Bool       | One-to-many |
+| ID       | Name   | UserID      | URL    | Interval     | IsEnabled | IsVisible | Alerts      |
+| -------- | ------ | ----------- | ------ | ------------ | --------- | --------- | ----------- |
+| Main Key | String | Foreign Key | String | Int (Second) | Bool      | Bool      | One-to-many |
 
-**Alert_Channels**
-| ID       | Name   | UserID      | Type             | Config | Alerts      | Is_Enabled |
-| -------- | ------ | ----------- | ---------------- | ------ | ----------- | ---------- |
-| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many | Bool       |
+**AlertChannels**
+| ID       | Name   | UserID      | Type             | Config | Alerts      | IsEnabled |
+| -------- | ------ | ----------- | ---------------- | ------ | ----------- | --------- |
+| Main Key | String | Foreign Key | Int (With Marco) | byte[] | One-to-many | Bool      |
 
 **Alerts**
-| ID       | UserID      | Alert_Channel_ID | Status                  |
-| -------- | ----------- | ---------------- | ----------------------- |
-| Main Key | Foreign Key | Foreign Key      | Int (Alerting/Resolved) |
+| ID       | UserID      | AlertChannelID | Status                  |
+| -------- | ----------- | -------------- | ----------------------- |
+| Main Key | Foreign Key | Foreign Key    | Int (Alerting/Resolved) |
 
 **Configs**
 Used to store dynamic InfluxDB configuration
@@ -52,13 +57,14 @@ Used to provide storage for OAuth Server
 
 #### InfluxDB Design
 
-Measurement: **up_status**
+Measurement: **upstatus**
 
-| Time | Is_Up            | Node             | EndpointID    |
+| Time | IsUp             | Node             | EndpointID    |
 | ---- | ---------------- | ---------------- | ------------- |
 | -    | Bool (Field Key) | String (Tag Key) | Int (Tag Key) |
 
 ### Initialization Process
+
 The initialization process is designed to be **idempotent**. It collects configuration from config file or environment variable and reconfigure UpMaster.
 
 The process will do the following steps:
@@ -67,7 +73,10 @@ The process will do the following steps:
 - Initialize InfluxDB: **influxdb-client-go** by InfluxDB Official is used as client. Database connection info is retrieved from SQLite. The database should already be create before this step. Measurement `up_status` will be created if not exists.
 
 ### Alert Module Design
+
 If any alert channel is created, a `StatusChecker` is created as a goroutine. It periodically poll data from InfluxDB and calculate if an endpoint is down. Then `StatusChecker` send an alert to all configured alert channel.
+
+The status change is decided by a 'sliding window' algorithm, which consider endpoint down if all the points in the window is down. The same strategy is applied to nodes, that is to say, a endpoint is considered down only when all the agents report endpoint down.
 
 ### Authencation Module Design
 
@@ -81,7 +90,12 @@ Token for frontend cannot write time series data, while token for agent cannot r
 
 Frontend
 
-`<todo>`
+`accessToken` and `refreshToken` is used in frontend. Both of them will be save in Session Cookie instead of Permanent Cookie if `keep me login` option is not checked. Frontend will verify if token is still valid by doing following things. If one of this failed, frontend will mark user as logout and redirect user to login page. 
+
+1. Check `exp` field in `accessToken` and `refreshToken`.
+2. Send a request to `/users/<username>` to get user object and verify if token is valid at the same time.
+
+Before every request, frontend will check expire time of `accessToken` and request `/auth/refresh` API with refreshToken first based on the situation.
 
 Agent
 
@@ -89,6 +103,7 @@ OAuth 2.0 is intended to be used. Agent reads `client_id` and `client_secret` fr
 
 ### API Design Principle
 API should be prefixed with version number, such as `v1`.
+
 API can be prefixed with certain prefix to avoid conflict with frontend. For example `api/v1`.
 
 The following design should be prefixed with `api/v1`:
@@ -97,7 +112,8 @@ The following design should be prefixed with `api/v1`:
 
 POST `/auth/login` return JWT token for frontend
 
-POST `/auth/reset` Used by password reset
+POST `/auth/reset` Used to send verification token
+PUT `/auth/reset` Used by reset password (including update password)
 
 OAuth Server at `/oauth`
 
@@ -107,6 +123,11 @@ GET `/endpoints` Get all endpoints info (Used by agent)
 
 Other endpoint direct operation
 
+**Status API** /endpoints/<endpoint_id>/status
+
+PUT `/endpoints/<endpoint_id>/status` is used by agent to write time series data
+
+GET `/endpoints/<endpoint_id>/status` is used by frontend (Certain endpoint page)
 
 **User API** /users
 
@@ -114,11 +135,17 @@ GET `/users` Admin
 
 User Permission is restricted within `/users/<username>` and `/users/<username>`
 
-PUT DELETE `/users/<id>` or `/users/<username>` Used by frontend admin page
+PUT DELETE `/users/<username>` Used by frontend admin page
+
+GET `/users/<username>/endpoints` Used by frontend user
+
+POST `/users/<username>/endpoints` Used by frontend user
+
+PUT DELETE `/users/<username>/endpoints/<endpoint_id>` Used by frontend user
 
 GET `/users/<username>/status` Used by frontend public page
 
-**Alert_Channel API** /alertchannels required Admin
+**AlertChannel API** /alertchannels required Admin
 
 GET `/alertchannels` Get all alert channels.
 

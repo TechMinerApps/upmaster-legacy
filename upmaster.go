@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/TechMinerApps/upmaster/modules/database"
+	"github.com/TechMinerApps/upmaster/modules/log"
 	"github.com/TechMinerApps/upmaster/modules/utils"
 	"github.com/TechMinerApps/upmaster/router"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -24,12 +24,12 @@ type UpMaster struct {
 	Config Config
 
 	DB          *gorm.DB
-	InfluxDB    *database.InfluxDB
+	InfluxDB    database.InfluxDB
 	HTTPServer  *http.Server
 	HTTPHandler *gin.Engine
 
 	viper  *viper.Viper
-	logger *logrus.Logger
+	logger log.Logger
 	wg     *sync.WaitGroup
 }
 
@@ -72,7 +72,7 @@ func (u *UpMaster) Start() {
 			u.logger.Fatalf("HTTP Server Listen Error: %v", err)
 		}
 	}()
-	u.logger.Info("UpMaster Started")
+	u.logger.Infof("UpMaster Started")
 
 	return
 }
@@ -90,7 +90,7 @@ func (u *UpMaster) Stop(sig os.Signal) {
 	if err := u.HTTPServer.Shutdown(ctx); err != nil {
 		u.logger.Errorf("Server Closed With Error: %s", err.Error())
 	}
-	u.logger.Info("UpMaster Shutdown")
+	u.logger.Infof("UpMaster Shutdown")
 	u.wg.Done()
 }
 
@@ -106,7 +106,7 @@ func (u *UpMaster) setupRouter() {
 	var err error
 	u.HTTPHandler, err = router.NewRouter(routerCfg)
 	if err != nil {
-		u.logger.Fatal(err)
+		u.logger.Fatalf("Router Config Failed: %v", err)
 	}
 }
 
@@ -152,5 +152,5 @@ func (u *UpMaster) setupViper() {
 }
 
 func (u *UpMaster) setupLogger() {
-	u.logger = logrus.New()
+	u.logger = log.NewLogger()
 }

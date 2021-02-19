@@ -29,7 +29,7 @@ func WriteEndpointStatus(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	influx := c.MustGet("InfluxDB").(*database.InfluxDB)
+	influx := c.MustGet("InfluxDB").(database.InfluxDB)
 	logger := c.MustGet("Logger").(*logrus.Logger)
 	p := database.StatusPoint{
 		Up:         req.Up,

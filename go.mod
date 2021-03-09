@@ -47,6 +47,6 @@ require (
 	gorm.io/driver/postgres v1.0.8 // indirect
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6 // indirect
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.21.3
 	src.techknowlogick.com/oauth2-gorm v0.0.0-20210107160330-cd7f5880b455
 )

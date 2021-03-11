@@ -43,10 +43,10 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/mysql v1.0.4
+	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.0.8 // indirect
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6 // indirect
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.21.3
 	src.techknowlogick.com/oauth2-gorm v0.0.0-20210107160330-cd7f5880b455
 )

@@ -96,6 +96,10 @@ definitions:
         x-go-name: UserID
     type: object
     x-go-package: github.com/TechMinerApps/upmaster/models
+  State:
+    format: uint64
+    type: integer
+    x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
   User:
     properties:
       alert_channals:
@@ -141,10 +145,11 @@ definitions:
         format: int64
         type: integer
         x-go-name: NodeID
+      time_stamp:
+        type: string
+        x-go-name: TimeStamp
       up:
-        format: int64
-        type: integer
-        x-go-name: Up
+        $ref: '#/definitions/State'
     type: object
     x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
   WriteEndpointResponse:
@@ -157,10 +162,11 @@ definitions:
         format: int64
         type: integer
         x-go-name: NodeID
+      time_stamp:
+        type: string
+        x-go-name: TimeStamp
       up:
-        format: int64
-        type: integer
-        x-go-name: Up
+        $ref: '#/definitions/State'
     type: object
     x-go-package: github.com/TechMinerApps/upmaster/router/api/v1/status
 info:

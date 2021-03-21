@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"strconv"
+	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
@@ -46,6 +47,7 @@ func (db *influxDB) Client() influxdb2.Client {
 
 // StatusPoint is a struct to write into InfluxDB
 type StatusPoint struct {
+	Time       time.Time
 	Up         int
 	NodeID     int
 	EndpointID int
@@ -77,7 +79,7 @@ func (db *influxDB) Write(s *StatusPoint) {
 	p := influxdb2.NewPointWithMeasurement("status").
 		AddField("up", s.Up).
 		AddTag("node", strconv.Itoa(s.NodeID)).
-		AddTag("endpoint", strconv.Itoa(s.EndpointID))
+		AddTag("endpoint", strconv.Itoa(s.EndpointID)).SetTime(s.Time)
 
 	api := db.WriteAPI()
 	api.WritePoint(p)

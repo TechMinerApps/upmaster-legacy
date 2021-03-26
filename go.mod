@@ -15,7 +15,6 @@ require (
 	github.com/influxdata/influxdb-client-go/v2 v2.2.2
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
-	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -46,6 +45,6 @@ require (
 	gorm.io/driver/postgres v1.0.8 // indirect
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6 // indirect
-	gorm.io/gorm v1.21.4
+	gorm.io/gorm v1.21.6
 	src.techknowlogick.com/oauth2-gorm v0.0.0-20210107160330-cd7f5880b455
 )

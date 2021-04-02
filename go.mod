@@ -12,7 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.5.1 // indirect
 	github.com/google/uuid v1.2.0 // indirect
-	github.com/influxdata/influxdb-client-go/v2 v2.2.2
+	github.com/influxdata/influxdb-client-go/v2 v2.2.3
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jinzhu/now v1.1.2 // indirect

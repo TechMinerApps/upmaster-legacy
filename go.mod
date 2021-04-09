@@ -6,9 +6,8 @@ require (
 	github.com/deepmap/oapi-codegen v1.5.5 // indirect
 	github.com/denisenkom/go-mssqldb v0.9.0 // indirect
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.1
 	github.com/go-oauth2/oauth2/v4 v4.2.0
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.5.1 // indirect
 	github.com/google/uuid v1.2.0 // indirect
